@@ -1,116 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-<meta charset="UTF-8">
-<title>Dhamaka Gift Reveal</title>
+<meta charset="utf-8">
+<title>Dhamaka Gift Reveal — Single Image</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: #fff;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  html,body {
+    height:100%;
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#fff;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
 
-  .container {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  .container{
+    position:relative;
+    width:100%;
+    height:100%;
   }
 
+  #headline{
+    position:absolute;
+    top:18px;
+    width:100%;
+    text-align:center;
+    font-size:34px;
+    font-weight:700;
+    color:#ff2b2b;
+    text-shadow:2px 2px 6px rgba(0,0,0,0.5);
+    z-index:6;
+    pointer-events:none;
+    animation:headlinePulse 1.1s ease-in-out infinite alternate;
+  }
+  @keyframes headlinePulse {
+    from { transform:scale(1); opacity:0.7; }
+    to   { transform:scale(1.06); opacity:1; }
+  }
+
+  /* Image */
   #gift {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(0.7);
-    display: none; /* पहले hidden रहेगा */
-    z-index: 2;
-    position: relative;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:none;           /* initially hidden until loaded */
+    transform:scale(0.78);
+    z-index:4;
+    position:relative;
+    transition:transform 600ms ease;
+    cursor:pointer;        /* click to replay effect */
   }
 
-  /* Loader (जब तक image load हो रही है) */
-  .loader {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 8px solid #ddd;
-    border-top: 8px solid red;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
-    z-index: 4;
+  /* Burst */
+  .burst{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:0;
+    height:0;
+    background:radial-gradient(circle, rgba(255,80,60,0.95) 30%, rgba(255,200,0,0.0) 70%);
+    border-radius:50%;
+    transform:translate(-50%,-50%) scale(0);
+    z-index:3;
+    pointer-events:none;
   }
-  @keyframes spin {
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-
-  /* धमाका burst effect */
-  .burst {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: radial-gradient(circle, #ff0000 40%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 0.8;
-    z-index: 1;
-  }
-  .burst.animate {
-    animation: burstAnim 0.6s ease forwards;
-  }
+  .burst.animate { animation: burstAnim 0.65s cubic-bezier(.2,.9,.2,1) forwards; }
   @keyframes burstAnim {
-    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-    60% { transform: translate(-50%, -50%) scale(3); opacity: 0.7; }
-    100% { transform: translate(-50%, -50%) scale(6); opacity: 0; }
+    0%   { transform:translate(-50%,-50%) scale(0); opacity:1; }
+    55%  { transform:translate(-50%,-50%) scale(2.4); opacity:0.8; }
+    100% { transform:translate(-50%,-50%) scale(5.8); opacity:0; }
   }
 
-  /* धमाका (gift zoom effect) */
+  /* Blast (image zoom) */
   .blast {
-    animation: blastEffect 0.8s ease forwards;
+    animation:blastEffect 0.85s cubic-bezier(.2,.9,.2,1) forwards;
   }
   @keyframes blastEffect {
-    0% { transform: scale(0.7) rotate(0deg); }
-    40% { transform: scale(1.3) rotate(10deg); }
-    70% { transform: scale(0.9) rotate(-6deg); }
-    100% { transform: scale(1) rotate(0deg); }
+    0%   { transform:scale(0.78) rotate(0deg); }
+    40%  { transform:scale(1.2) rotate(6deg); }
+    70%  { transform:scale(0.95) rotate(-4deg); }
+    100% { transform:scale(1) rotate(0deg); }
   }
 
-  /* ऊपर टेक्स्ट */
-  #headline {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    text-align: center;
-    font-size: 36px;
-    font-weight: bold;
-    color: #ff0000;
-    text-shadow: 2px 2px 5px #000;
-    animation: flash 1s infinite alternate;
-    z-index: 3;
+  /* Loader wrapper + spinner */
+  .loader-wrap {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
   }
-  @keyframes flash {
-    from { opacity: 0.3; transform: scale(1); }
-    to { opacity: 1; transform: scale(1.1); }
+  .loader {
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    border:7px solid #e6e6e6;
+    border-top-color:#ff2b2b;
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .loading-text {
+    font-weight:600;
+    color:#333;
+    font-size:15px;
+    text-shadow:0 1px 0 #fff;
+  }
+
+  /* Error overlay */
+  .error {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:8;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:10px;
+    background:rgba(255,255,255,0.95);
+    padding:14px 18px;
+    border-radius:10px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.15);
+    text-align:center;
+  }
+  .error button {
+    background:#ff3b3b;
+    color:#fff;
+    border:0;
+    padding:8px 12px;
+    border-radius:6px;
+    font-weight:700;
+    cursor:pointer;
+  }
+
+  /* small sparkle after blast to keep lively */
+  .sparkle {
+    position:absolute;
+    width:40px;
+    height:40px;
+    top:18%;
+    right:12%;
+    pointer-events:none;
+    z-index:5;
+    opacity:0;
+  }
+  .sparkle.show {
+    animation: sparklePop 900ms ease forwards;
+  }
+  @keyframes sparklePop {
+    0% { transform:scale(0.6) rotate(0deg); opacity:0; }
+    30% { transform:scale(1.2) rotate(15deg); opacity:1; }
+    100% { transform:scale(1) rotate(0deg); opacity:0; }
+  }
+
+  /* keep everything responsive */
+  @media (max-width:600px) {
+    #headline { font-size:22px; top:14px; }
   }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="container">
   <div id="headline">💥 Super Dhamaka Offer 💥</div>
-  <div class="loader" id="loader"></div>
+
+  <div class="loader-wrap" id="loaderWrap">
+    <div class="loader" aria-hidden="true"></div>
+    <div class="loading-text">Loading...</div>
+  </div>
+
   <div class="burst" id="burst"></div>
-  <img id="gift" src="" alt="Gift Image">
+  <img id="gift" alt="Gift Image">
+  <img class="sparkle" id="sparkle" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23FFD54F' d='M12 2l1.8 4.2L18 8l-4.2 1.8L12 14l-1.8-4.2L6 8l4.2-1.8L12 2z'/></svg>" />
+
+  <div class="error" id="errorBox">
+    <div style="font-weight:700; color:#d33;">Image failed to load</div>
+    <div style="color:#444; font-size:14px;">Network slow या image missing हो सकती है.</div>
+    <button id="retryBtn">Try again</button>
+  </div>
 </div>
 
 <script>
+/*
+  Behavior:
+  - Choose ONE random image
+  - Show loader until it finishes loading
+  - After load: hide loader -> show image -> burst + blast (once)
+  - If error: show retry overlay
+  - Click image to replay the blast (no re-download)
+*/
+
 const images = [
   "https://i.ibb.co/ycyZQ8cZ/Photo-Room-20250915-170545.png",
   "https://i.ibb.co/ns9xS3NK/Photo-Room-20250915-170521.png",
@@ -120,38 +206,99 @@ const images = [
   "https://i.ibb.co/pjQjhmG2/Photo-Room-20250915-165342.png"
 ];
 
-function showFullScreen() {
-  const randomIndex = Math.floor(Math.random() * images.length);
-  const giftImg = document.getElementById("gift");
-  const burst = document.getElementById("burst");
-  const loader = document.getElementById("loader");
+const gift = document.getElementById('gift');
+const loaderWrap = document.getElementById('loaderWrap');
+const burst = document.getElementById('burst');
+const errorBox = document.getElementById('errorBox');
+const retryBtn = document.getElementById('retryBtn');
+const sparkle = document.getElementById('sparkle');
 
-  // Reset
-  giftImg.style.display = "none";
-  loader.style.display = "block";
-  giftImg.classList.remove("blast");
-  burst.classList.remove("animate");
+let currentSrc = null;
+let playedOnce = false;
 
-  // नई image load करो
+function pickOneAndLoad() {
+  // choose a random index
+  const idx = Math.floor(Math.random() * images.length);
+  const src = images[idx];
+  currentSrc = src;
+  playedOnce = false;
+
+  // reset UI
+  loaderWrap.style.display = 'flex';
+  gift.style.display = 'none';
+  gift.classList.remove('blast');
+  burst.classList.remove('animate');
+  sparkle.classList.remove('show');
+  errorBox.style.display = 'none';
+
+  // load only the selected image
   const img = new Image();
-  img.src = images[randomIndex];
-  img.onload = function() {
-    loader.style.display = "none";
-    giftImg.src = img.src;
-    giftImg.style.display = "block";
+  img.src = src;
 
-    burst.classList.add("animate"); 
-    setTimeout(() => {
-      giftImg.classList.add("blast");
-    }, 200);
+  // set sensible timeout in case remote host is very slow
+  const loadTimeout = setTimeout(() => {
+    // if not loaded by 6s, show a gentle retry message
+    if (!gift.complete || gift.src !== src) {
+      loaderWrap.style.display = 'none';
+      errorBox.style.display = 'flex';
+    }
+  }, 6000);
+
+  img.onload = () => {
+    clearTimeout(loadTimeout);
+    loaderWrap.style.display = 'none';
+    gift.src = src;
+    gift.style.display = 'block';
+
+    // small delay to allow rendering, then play effects
+    requestAnimationFrame(() => {
+      // burst and blast
+      burst.classList.add('animate');
+      setTimeout(() => {
+        gift.classList.add('blast');
+      }, 150);
+
+      // sparkle to make lively
+      setTimeout(() => {
+        sparkle.classList.add('show');
+      }, 500);
+
+      // mark played
+      playedOnce = true;
+    });
+  };
+
+  img.onerror = () => {
+    clearTimeout(loadTimeout);
+    loaderWrap.style.display = 'none';
+    errorBox.style.display = 'flex';
   };
 }
 
-// पहली बार
-showFullScreen();
+// Click image to replay the visual effect (no reload)
+gift.addEventListener('click', () => {
+  if (!gift.src) return;
+  // replay burst & blast
+  burst.classList.remove('animate');
+  gift.classList.remove('blast');
+  sparkle.classList.remove('show');
 
-// Auto change हर 4 सेकंड में
-setInterval(showFullScreen, 4000);
+  // small reflow to restart animations
+  void burst.offsetWidth;
+  void gift.offsetWidth;
+
+  burst.classList.add('animate');
+  setTimeout(() => gift.classList.add('blast'), 120);
+  setTimeout(() => sparkle.classList.add('show'), 480);
+});
+
+// Retry button
+retryBtn.addEventListener('click', () => {
+  pickOneAndLoad();
+});
+
+// initial load: only ONE image
+pickOneAndLoad();
 </script>
 
 </body>
