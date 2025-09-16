@@ -26,10 +26,27 @@
     height: 100%;
     object-fit: cover;
     transform: scale(0.7);
-    transition: transform 1s ease;
-    display: block;
+    display: none; /* पहले hidden रहेगा */
     z-index: 2;
     position: relative;
+  }
+
+  /* Loader (जब तक image load हो रही है) */
+  .loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 8px solid #ddd;
+    border-top: 8px solid red;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    z-index: 4;
+  }
+  @keyframes spin {
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
   }
 
   /* धमाका burst effect */
@@ -45,11 +62,9 @@
     opacity: 0.8;
     z-index: 1;
   }
-
   .burst.animate {
     animation: burstAnim 0.6s ease forwards;
   }
-
   @keyframes burstAnim {
     0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
     60% { transform: translate(-50%, -50%) scale(3); opacity: 0.7; }
@@ -80,7 +95,6 @@
     animation: flash 1s infinite alternate;
     z-index: 3;
   }
-
   @keyframes flash {
     from { opacity: 0.3; transform: scale(1); }
     to { opacity: 1; transform: scale(1.1); }
@@ -91,6 +105,7 @@
 
 <div class="container">
   <div id="headline">💥 Super Dhamaka Offer 💥</div>
+  <div class="loader" id="loader"></div>
   <div class="burst" id="burst"></div>
   <img id="gift" src="" alt="Gift Image">
 </div>
@@ -105,28 +120,38 @@ const images = [
   "https://i.ibb.co/pjQjhmG2/Photo-Room-20250915-165342.png"
 ];
 
-// Preload all images
-const preloaded = [];
-images.forEach(src => {
-  const img = new Image();
-  img.src = src;
-  preloaded.push(img);
-});
-
 function showFullScreen() {
   const randomIndex = Math.floor(Math.random() * images.length);
   const giftImg = document.getElementById("gift");
   const burst = document.getElementById("burst");
+  const loader = document.getElementById("loader");
 
-  giftImg.src = images[randomIndex];
+  // Reset
+  giftImg.style.display = "none";
+  loader.style.display = "block";
+  giftImg.classList.remove("blast");
+  burst.classList.remove("animate");
 
-  burst.classList.add("animate"); // धमाका burst
-  setTimeout(() => {
-    giftImg.classList.add("blast"); // गिफ्ट zoom effect
-  }, 200);
+  // नई image load करो
+  const img = new Image();
+  img.src = images[randomIndex];
+  img.onload = function() {
+    loader.style.display = "none";
+    giftImg.src = img.src;
+    giftImg.style.display = "block";
+
+    burst.classList.add("animate"); 
+    setTimeout(() => {
+      giftImg.classList.add("blast");
+    }, 200);
+  };
 }
 
+// पहली बार
 showFullScreen();
+
+// Auto change हर 4 सेकंड में
+setInterval(showFullScreen, 4000);
 </script>
 
 </body>
