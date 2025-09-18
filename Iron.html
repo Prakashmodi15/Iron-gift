@@ -194,23 +194,12 @@
   - Show loader until it finishes loading
   - After load: hide loader -> show image -> burst + blast (once)
   - If error: show retry overlay
-  - Click image to replay the blast (no re-download)
-*/
-
-const images = [
-  "https://i.ibb.co/ycyZQ8cZ/Photo-Room-20250915-170545.png",
-  "https://i.ibb.co/ns9xS3NK/Photo-Room-20250915-170521.png",
-  "https://i.ibb.co/qzWBHBZ/Photo-Room-20250915-170458.png",
-  "https://i.ibb.co/f3GLZZk/Photo-Room-20250915-170056.png",
-  "https://i.ibb.co/v692ttPj/Photo-Room-20250915-170002.png",
-  "https://i.ibb.co/pjQjhmG2/Photo-Room-20250915-165342.png"
+  - Click image to replay the blast (no re-downlo
 ];
 
 const gift = document.getElementById('gift');
 const loaderWrap = document.getElementById('loaderWrap');
-const burst = document.getElementById('burst');
-const errorBox = document.getElementById('errorBox');
-const retryBtn = document.getElementById('retryBtn');
+ctn = document.getElementById('retryBtn');
 const sparkle = document.getElementById('sparkle');
 
 let currentSrc = null;
@@ -220,10 +209,7 @@ function pickOneAndLoad() {
   // choose a random index
   const idx = Math.floor(Math.random() * images.length);
   const src = images[idx];
-  currentSrc = src;
-  playedOnce = false;
-
-  // reset UI
+  currentSrc = src;t UI
   loaderWrap.style.display = 'flex';
   gift.style.display = 'none';
   gift.classList.remove('blast');
@@ -235,8 +221,7 @@ function pickOneAndLoad() {
   const img = new Image();
   img.src = src;
 
-  // set sensible timeout in case remote host is very slow
-  const loadTimeout = setTimeout(() => {
+  // set sensible timeout in case remote eout = setTimeout(() => {
     // if not loaded by 6s, show a gentle retry message
     if (!gift.complete || gift.src !== src) {
       loaderWrap.style.display = 'none';
@@ -270,36 +255,4 @@ function pickOneAndLoad() {
 
   img.onerror = () => {
     clearTimeout(loadTimeout);
-    loaderWrap.style.display = 'none';
-    errorBox.style.display = 'flex';
-  };
-}
-
-// Click image to replay the visual effect (no reload)
-gift.addEventListener('click', () => {
-  if (!gift.src) return;
-  // replay burst & blast
-  burst.classList.remove('animate');
-  gift.classList.remove('blast');
-  sparkle.classList.remove('show');
-
-  // small reflow to restart animations
-  void burst.offsetWidth;
-  void gift.offsetWidth;
-
-  burst.classList.add('animate');
-  setTimeout(() => gift.classList.add('blast'), 120);
-  setTimeout(() => sparkle.classList.add('show'), 480);
-});
-
-// Retry button
-retryBtn.addEventListener('click', () => {
-  pickOneAndLoad();
-});
-
-// initial load: only ONE image
-pickOneAndLoad();
-</script>
-
-</body>
-</html
+    loaderWrap.sty
